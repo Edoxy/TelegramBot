@@ -1,4 +1,6 @@
 import yfinance as yf
+import pandas as pd
+
 
 def InfoStock():
     ## Write the message with the info about the traked indexes ##
@@ -9,6 +11,9 @@ def InfoStock():
     
     
     data = yf.download(tickers=tick, period='1d', interval='1m')
+    print(data)
+    
+    #add a function to delete the NaN value from the dataset
 
     value = []
     TOLL = 0.7
