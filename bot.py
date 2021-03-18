@@ -1,13 +1,15 @@
 
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 from telegram import Update
+from get_tokens import get_token
+
 import logging
 import exchange
 import pandas as pd
 import yfinance as yf
 import time
 
-api_key = '9CAO4KO14CQNNDSN'
+
 
 
 def mess(context):
@@ -40,7 +42,7 @@ def mess(context):
 
 
 # IMPORTANTE: inserire il token fornito dal BotFather nella seguente stringa
-TOKEN = "1666334010:AAHlFRfxJsH4A7JJJ3YUhxaLklqeQcsQo_o"
+TOKEN, api_key = get_token()
 
 
 def extract_number(text):
