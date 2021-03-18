@@ -1,7 +1,8 @@
 
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 from telegram import Update
-from get_tokens import get_token
+from get_token import Get_token
+from stocks import InfoStock
 
 import logging
 import exchange
@@ -10,51 +11,26 @@ import yfinance as yf
 import time
 
 
-
-
-def mess(context):
-
-    job = context.job
-    
-    Indexes = ['AAPL', 'MSFT', 'GOOGL', 'AMZN']
-    tick = ''
-    for x in Indexes:
-        tick += x + ' '
-    
-    
-    data = yf.download(tickers=tick, period='1d', interval='1m')
-
-    value = []
-    TOLL = 0.7
-    for x in Indexes:
-        perc = round(100*(data['Close'][x][-1] / data['Open'][x][0] -1), 3)
-        past = round(100*(data['Close'][x][-5] / data['Open'][x][0] -1), 3)
-        if  True:#abs(perc - past) > TOLL :
-            value.append([perc, x])
-
-    textinfo = 'info:\n'
-    for x in value:
-        textinfo += str(x[0]) + ' ' + x[1] + '\n'
-
-    if textinfo != 'info:\n':
-        print(textinfo)
-        context.bot.send_message(job.context, text=textinfo)
-
-
 # IMPORTANTE: inserire il token fornito dal BotFather nella seguente stringa
-TOKEN, api_key = get_token()
+TOKEN, api_key = Get_token()
 
+# Returns message with stocks information
+def Stock(context):
+    job = context.job
+    #calls the method that will process and create the message content
+    textinfo = InfoStock()
+    #sends the message only if the message is not empty
+    if textinfo != 'info:\n':
+        context.bot.send_message(job.context, text=textinfo)
 
 def extract_number(text):
     return text.split()[1].strip()
-
 
 def convert_usd(update, context):
     usd = float(extract_number(update.message.text))
     eur = exchange.from_usd_to_eur(usd)
     print(f'Eseguita conversione da {usd} USD a {eur} EUR')
     update.message.reply_text(f'{eur} EUR')
-
 
 def convert_eur(update, context):
     eur = float(extract_number(update.message.text))
@@ -126,7 +102,7 @@ def unset(update: Update, context: CallbackContext) -> None:
 
 def stonks(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
-    context.job_queue.run_repeating(mess, 60, context = chat_id, name='stocks')
+    context.job_queue.run_repeating(Stock, 60, context = chat_id, name='stocks')
 
 
 def main():
