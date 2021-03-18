@@ -1,0 +1,5 @@
+install packeges in your venv to run this bot:
+    -python-telegram-bot
+    -pandas
+    -yfinance
+    
