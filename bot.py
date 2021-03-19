@@ -14,17 +14,10 @@ import time
 # IMPORTANTE: inserire il token fornito dal BotFather nella seguente stringa
 TOKEN, api_key = Get_token()
 
-# Returns message with stocks information
-def Stock(context):
-    job = context.job
-    #calls the method that will process and create the message content
-    textinfo = InfoStock()
-    #sends the message only if the message is not empty
-    if textinfo != 'info:\n':
-        context.bot.send_message(job.context, text=textinfo)
 
 def extract_number(text):
     return text.split()[1].strip()
+
 
 def convert_usd(update, context):
     usd = float(extract_number(update.message.text))
@@ -32,11 +25,13 @@ def convert_usd(update, context):
     print(f'Eseguita conversione da {usd} USD a {eur} EUR')
     update.message.reply_text(f'{eur} EUR')
 
+
 def convert_eur(update, context):
     eur = float(extract_number(update.message.text))
     usd = exchange.from_eur_to_usd(eur)
     print(f'Eseguita conversione da {eur} EUR a {usd} USD')
     update.message.reply_text(f'{usd} USD')
+
 
 # Enable logging
 logging.basicConfig(
@@ -49,7 +44,7 @@ logger = logging.getLogger(__name__)
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text('Hi! Use /set <seconds> to set a timer')
+    update.message.reply_text('Hi! Use /set <seconds> to set a timer\n/stocks to see market status')
 
 
 def alarm(context):
@@ -100,17 +95,30 @@ def unset(update: Update, context: CallbackContext) -> None:
     text = 'Timer successfully cancelled!' if job_removed else 'You have no active timer.'
     update.message.reply_text(text)
 
+# Returns message with stocks information
+
+
+def Stock(context):
+    job = context.job
+    # calls the method that will process and create the message content
+    textinfo = InfoStock()
+    # sends the message only if the message is not empty
+    if textinfo != 'info:\n':
+        context.bot.send_message(job.context, text=textinfo)
+
+
 def stocks(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
 
     data = GetData('AAPL')
-
     if DateCheck(data):
         update.message.reply_text('This market is open and up to date')
+        context.job_queue.run_repeating(
+            Stock, 60, context=chat_id, name='stocks')
     else:
-        update.message.reply_text('Sorry, Market closed or the dataset is not up to date')
-    
-    context.job_queue.run_repeating(Stock, 60, context = chat_id, name='stocks')
+        update.message.reply_text(
+            'Sorry, Market closed or the dataset is not up to date')
+
 
 def stop_stocks(update: Update, context: CallbackContext) -> None:
     """Remove the job: Stocks updating"""
@@ -132,6 +140,7 @@ def main():
     disp.add_handler(CommandHandler("set", set_timer))
     disp.add_handler(CommandHandler("unset", unset))
 
+    #stocks commands
     disp.add_handler(CommandHandler("stocks", stocks))
     disp.add_handler(CommandHandler("nostocks", stop_stocks))
 
