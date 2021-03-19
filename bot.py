@@ -2,7 +2,7 @@
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 from telegram import Update
 from get_token import Get_token
-from stocks import InfoStock
+from stocks import InfoStock, DateCheck, GetData
 
 import logging
 import exchange
@@ -100,9 +100,24 @@ def unset(update: Update, context: CallbackContext) -> None:
     text = 'Timer successfully cancelled!' if job_removed else 'You have no active timer.'
     update.message.reply_text(text)
 
-def stonks(update: Update, context: CallbackContext) -> None:
+def stocks(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
+
+    data = GetData('AAPL')
+
+    if DateCheck(data):
+        update.message.reply_text('This market is open and up to date')
+    else:
+        update.message.reply_text('Sorry, Market closed or the dataset is not up to date')
+    
     context.job_queue.run_repeating(Stock, 60, context = chat_id, name='stocks')
+
+def stop_stocks(update: Update, context: CallbackContext) -> None:
+    """Remove the job: Stocks updating"""
+    chat_id = update.message.chat_id
+    job_removed = remove_job_if_exists('stocks', context)
+    text = 'Market updating stopped' if job_removed else 'Stock was not started'
+    update.message.reply_text(text)
 
 
 def main():
@@ -117,7 +132,8 @@ def main():
     disp.add_handler(CommandHandler("set", set_timer))
     disp.add_handler(CommandHandler("unset", unset))
 
-    disp.add_handler(CommandHandler("stocks", stonks))
+    disp.add_handler(CommandHandler("stocks", stocks))
+    disp.add_handler(CommandHandler("nostocks", stop_stocks))
 
     upd.start_polling()
 
