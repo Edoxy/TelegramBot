@@ -1,37 +1,19 @@
 
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 from telegram import Update
-from get_token import Get_token
+from get_token import get_token, get_key_alpha, get_key_yahoo
 from stocks import InfoStock, DateCheck, GetData
 
 import logging
-import exchange
 import pandas as pd
 import yfinance as yf
 import time
 
 
-# IMPORTANTE: inserire il token fornito dal BotFather nella seguente stringa
-TOKEN, api_key = Get_token()
-
-
-def extract_number(text):
-    return text.split()[1].strip()
-
-
-def convert_usd(update, context):
-    usd = float(extract_number(update.message.text))
-    eur = exchange.from_usd_to_eur(usd)
-    print(f'Eseguita conversione da {usd} USD a {eur} EUR')
-    update.message.reply_text(f'{eur} EUR')
-
-
-def convert_eur(update, context):
-    eur = float(extract_number(update.message.text))
-    usd = exchange.from_eur_to_usd(eur)
-    print(f'Eseguita conversione da {eur} EUR a {usd} USD')
-    update.message.reply_text(f'{usd} USD')
-
+# Inserisce i token e le API keys nelle costanti
+TOKEN = get_token()
+API_Y = get_key_yahoo()
+API_A = get_key_alpha()
 
 # Enable logging
 logging.basicConfig(
@@ -40,8 +22,6 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-
-# Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Hi! Use /set <seconds> to set a timer\n/stocks to see market status')
@@ -50,7 +30,7 @@ def start(update: Update, context: CallbackContext) -> None:
 def alarm(context):
     """Send the alarm message."""
     job = context.job
-    context.bot.send_message(job.context, text='Beep Cazzo!')
+    context.bot.send_message(job.context, text='Beep... Beep!')
     context.bot.send_message(job.context, text='...')
     context.bot.send_message(job.context, text='BEEP BEEP!!')
 
@@ -96,8 +76,6 @@ def unset(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(text)
 
 # Returns message with stocks information
-
-
 def Stock(context):
     job = context.job
     # calls the method that will process and create the message content
@@ -106,10 +84,9 @@ def Stock(context):
     if textinfo != 'info:\n':
         context.bot.send_message(job.context, text=textinfo)
 
-
+#schedueler
 def stocks(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
-
     data = GetData('AAPL')
     if DateCheck(data):
         update.message.reply_text('This market is open and up to date')
@@ -132,15 +109,14 @@ def main():
     upd = Updater(TOKEN, use_context=True)
     disp = upd.dispatcher
 
-    disp.add_handler(CommandHandler("usd", convert_usd))
-    disp.add_handler(CommandHandler("eur", convert_eur))
-
     disp.add_handler(CommandHandler("start", start))
     disp.add_handler(CommandHandler("help", start))
+
+    ##Timer commands
     disp.add_handler(CommandHandler("set", set_timer))
     disp.add_handler(CommandHandler("unset", unset))
 
-    #stocks commands
+    #Stocks commands
     disp.add_handler(CommandHandler("stocks", stocks))
     disp.add_handler(CommandHandler("nostocks", stop_stocks))
 
