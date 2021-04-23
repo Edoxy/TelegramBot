@@ -4,6 +4,8 @@ from telegram import Update
 from get_token import get_token, get_key_alpha, get_key_yahoo
 from stocks import InfoStock, DateCheck, GetData
 
+from questions import answer, who
+
 import logging
 import pandas as pd
 import yfinance as yf
@@ -34,6 +36,7 @@ def _help(update: Update, constext: CallbackContext) -> None:
     text += "/stocks : per avere informazioni live sul mercato azionario\n\n"
     text += "/nostocks : per interrompere le informazioni\n\n"
     text += "/ans + 'una domanda' : per ricevere una risposta ad una domanda (si o no)\n\n"
+    text += "/chi + 'una domanda' : per ricevere la risposta (persona)\n\n"
 
     update.message.reply_text(text)
 
@@ -114,18 +117,6 @@ def stop_stocks(update: Update, context: CallbackContext) -> None:
     text = 'Market updating stopped' if job_removed else 'Stock was not started'
     update.message.reply_text(text)
 
-def answer(update: Update, constext: CallbackContext)-> None:
-    chat_id = update.message.chat_id
-    answ_list = ['Si', 'No', 'Ma figurati', 'Fatti furbo', 'Certo', 'Certamente', 'ehmm...', 'Fai un po te...', 'Col cazzo', 'Sicuro', 'Stanne certo',
-                'La vedo dura', 'Mai dire mai', 'AHAHAHAHA', 'mmmm', 'Non rispondo', 'Mi astengo', 'Chiedi a tua madre', 'Ovvio', 'Ovvio che no', 'Sicuramente',
-                'Certo che no', 'N\nO', 'SI SI...', 'Tu credici...', 'Vedrai ;)', 'Sono Positivo', 'Negativo', 'Damn Daniel...', 'Ti sei visto?',
-                'Prova a richiedere', 'ahahaha emmm', 'Sei scemo?', 'Mi sa di si', 'Mi sa di no', 'Aspetta e spera', 'sni?', 'Due lettere:\nS\nI',
-                'fatti un esame di coscienza', 'Chiedi a papino', 'Allora sei forte', 'Datti una sveglia']
-    answ = random.choice(answ_list)
-    update.message.reply_text(answ)
-    
-    print(update.message.text, answ)
-
 def main():
     upd = Updater(TOKEN, use_context=True)
     disp = upd.dispatcher
@@ -143,6 +134,7 @@ def main():
 
     #New Command
     disp.add_handler(CommandHandler("ans", answer))
+    disp.add_handler(CommandHandler("chi", who))
 
     upd.start_polling()
 
