@@ -119,7 +119,8 @@ def answer(update: Update, constext: CallbackContext)-> None:
     answ_list = ['Si', 'No', 'Ma figurati', 'Fatti furbo', 'Certo', 'Certamente', 'ehmm...', 'Fai un po te...', 'Col cazzo', 'Sicuro', 'Stanne certo',
                 'La vedo dura', 'Mai dire mai', 'AHAHAHAHA', 'mmmm', 'Non rispondo', 'Mi astengo', 'Chiedi a tua madre', 'Ovvio', 'Ovvio che no', 'Sicuramente',
                 'Certo che no', 'N\nO', 'SI SI...', 'Tu credici...', 'Vedrai ;)', 'Sono Positivo', 'Negativo', 'Damn Daniel...', 'Ti sei visto?',
-                'Prova a richiedere', 'ahahaha emmm', 'Sei scemo?', 'Mi sa di si', 'Mi sa di no', 'Aspetta e spera', 'sni?']
+                'Prova a richiedere', 'ahahaha emmm', 'Sei scemo?', 'Mi sa di si', 'Mi sa di no', 'Aspetta e spera', 'sni?', 'Due lettere:\nS\nI',
+                'fatti un esame di coscienza', 'Chiedi a papino', 'Allora sei forte', 'Datti una sveglia']
     answ = random.choice(answ_list)
     update.message.reply_text(answ)
     
