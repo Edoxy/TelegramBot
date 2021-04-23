@@ -3,3 +3,4 @@ __pycache__
 .vscode 
 get_token.py
 telegram_bot.code-workspace
+.DS_Store

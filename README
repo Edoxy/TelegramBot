@@ -1,5 +1,12 @@
+#PYTHON TELEGRAM BOT
+
+##Requirements
+
 install packeges in your venv to run this bot:
     -python-telegram-bot
     -pandas
     -yfinance
     
+##WARNING
+
+To use this bot youl need a .py file that outputs the api keys with the name of the imported file in the bot.py file

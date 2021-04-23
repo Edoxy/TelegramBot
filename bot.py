@@ -1,4 +1,4 @@
-
+import random
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 from telegram import Update
 from get_token import get_token, get_key_alpha, get_key_yahoo
@@ -24,8 +24,18 @@ logger = logging.getLogger(__name__)
 
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text('Hi! Use /set <seconds> to set a timer\n/stocks to see market status')
+    update.message.reply_text('Ciao sono un bot inutile :). Per usare i miei comandi scrivi "/" e un comando. Per aiuto scrivi /help')
 
+def _help(update: Update, constext: CallbackContext) -> None:
+
+    text = "I possibili comandi sono:\n"
+    text += "/set + #secondi : per settare un timer della durata speificata;\n\n"
+    text += "/unset : per interrompere il timer prima del termine\n\n"
+    text += "/stocks : per avere informazioni live sul mercato azionario\n\n"
+    text += "/nostocks : per interrompere le informazioni\n\n"
+    text += "/ans + 'una domanda' : per ricevere una risposta ad una domanda (si o no)\n\n"
+
+    update.message.reply_text(text)
 
 def alarm(context):
     """Send the alarm message."""
@@ -104,13 +114,23 @@ def stop_stocks(update: Update, context: CallbackContext) -> None:
     text = 'Market updating stopped' if job_removed else 'Stock was not started'
     update.message.reply_text(text)
 
+def answer(update: Update, constext: CallbackContext)-> None:
+    chat_id = update.message.chat_id
+    answ_list = ['Si', 'No', 'Ma figurati', 'Fatti furbo', 'Certo', 'Certamente', 'ehmm...', 'Fai un po te...', 'Col cazzo', 'Sicuro', 'Stanne certo',
+                'La vedo dura', 'Mai dire mai', 'AHAHAHAHA', 'mmmm', 'Non rispondo', 'Mi astengo', 'Chiedi a tua madre', 'Ovvio', 'Ovvio che no', 'Sicuramente',
+                'Certo che no', 'N\nO', 'SI SI...', 'Tu credici...', 'Vedrai ;)', 'Sono Positivo', 'Negativo', 'Damn Daniel...', 'Ti sei visto?',
+                'Prova a richiedere', 'ahahaha emmm', 'Sei scemo?', 'Mi sa di si', 'Mi sa di no', 'Aspetta e spera', 'sni?']
+    answ = random.choice(answ_list)
+    update.message.reply_text(answ)
+    
+    print(update.message.text, answ)
 
 def main():
     upd = Updater(TOKEN, use_context=True)
     disp = upd.dispatcher
 
     disp.add_handler(CommandHandler("start", start))
-    disp.add_handler(CommandHandler("help", start))
+    disp.add_handler(CommandHandler("help", _help))
 
     ##Timer commands
     disp.add_handler(CommandHandler("set", set_timer))
@@ -119,6 +139,9 @@ def main():
     #Stocks commands
     disp.add_handler(CommandHandler("stocks", stocks))
     disp.add_handler(CommandHandler("nostocks", stop_stocks))
+
+    #New Command
+    disp.add_handler(CommandHandler("ans", answer))
 
     upd.start_polling()
 
