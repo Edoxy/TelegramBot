@@ -4,7 +4,8 @@ from telegram import Update
 from get_token import get_token, get_key_alpha, get_key_yahoo
 from stocks import InfoStock, DateCheck, GetData
 
-from questions import answer, who
+from questions import answer, who, dove
+from oroscopo import oro
 
 import logging
 import pandas as pd
@@ -135,6 +136,10 @@ def main():
     #New Command
     disp.add_handler(CommandHandler("ans", answer))
     disp.add_handler(CommandHandler("chi", who))
+    disp.add_handler(CommandHandler("dove", dove))
+    disp.add_handler(CommandHandler("come", who))
+    disp.add_handler(CommandHandler("hm", who))
+    disp.add_handler(CommandHandler("oro", oro))
 
     upd.start_polling()
 
